@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
-import productRoutes from "./routes/Product"; // adjust as per your folder structure
+import productRoutes from "./routes/Product.js"; // adjust as per your folder structure
 
 dotenv.config();
 
