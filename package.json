@@ -8,6 +8,9 @@
     "start": "node backend/server.js",
     "build": "cd frontend && npm install && npm run build"
   },
+  "engines": {
+    "node": "20.x"
+  },
   "type": "module",
   "keywords": [],
   "author": "",
