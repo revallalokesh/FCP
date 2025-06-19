@@ -1,32 +1,40 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import path from 'path';
-import { connectDB } from './config/db.js';
-import productRoutes from './routes/Product.js';
+import express from "express";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import path from "path";
+import { fileURLToPath } from "url";
+import productRoutes from "./routes/product.routes.js"; // adjust as per your folder structure
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+app.use(express.json());
 
-const __dirname = path.resolve();
+// API Routes
+app.use("/api/products", productRoutes);
 
-app.use(express.json()); 
+// -------- Serve Frontend Build in Production --------
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-app.use(express.urlencoded({}))
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-app.use('/api/products', productRoutes); // Use the product routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+});
+// -----------------------------------------------------
 
-if(process.env.NODE_ENV === "production"){
-  app.use(express.static(path.join(__dirname,"frontend/dist")));
-
-  app.get('*',(req,res)=>{
-    res.sendFile(path.resolve(__dirname,'frontend','dist','index.html'));
+// Connect to MongoDB and Start Server
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
   })
-
-}
-
-app.listen(PORT, () => {
-  connectDB();
-  console.log(`Server is running on port ${PORT}`);
-}); 
+  .then(() => {
+    console.log("MongoDB connected");
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((err) => console.log(err));
